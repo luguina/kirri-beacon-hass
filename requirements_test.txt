@@ -4,7 +4,7 @@
 #
 # These need Python 3.14. On 3.12 pip silently backtracks to Home Assistant 2025.1.4 and
 # on 3.13 to 2026.2.3 - both import cleanly and then test a core nobody runs.
-homeassistant==2026.8.1
+homeassistant==2026.8.2
 pytest==9.1.1
 
 # Imported by homeassistant.components.usb but not declared by the core package. Without
