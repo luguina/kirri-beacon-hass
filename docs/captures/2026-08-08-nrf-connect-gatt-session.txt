@@ -1,0 +1,214 @@
+# MAC address redacted (XX:XX:XX:XX:XX:XX). The real one is not in this repo — see docs/privacy.md
+nRF Connect, 2026-08-08
+AJBLE100 (XX:XX:XX:XX:XX:XX)
+V	19:31:24.403	Connecting to XX:XX:XX:XX:XX:XX...
+D	19:31:24.403	gatt = device.connectGatt(autoConnect = false, TRANSPORT_LE, preferred PHY = LE 1M)
+D	19:31:27.542	[Callback] Connection state changed with status: 0 and new state: CONNECTED (2)
+I	19:31:27.548	Connected to XX:XX:XX:XX:XX:XX
+V	19:31:27.551	Discovering services...
+D	19:31:27.551	gatt.discoverServices()
+D	19:31:27.568	[Broadcast] Action received: android.bluetooth.device.action.ACL_CONNECTED
+D	19:31:28.068	[Callback] Services discovered with status: 0
+I	19:31:28.068	Services discovered
+V	19:31:28.074	Generic Access (0x1800)
+- Device Name [R] (0x2A00)
+- Appearance [R] (0x2A01)
+- Peripheral Preferred Connection Parameters [R] (0x2A04)
+Unknown Service (edfec62e-9910-0bac-5241-d8bda6932a2f)
+- Unknown Characteristic [N] (0783b03e-8535-b5a0-7140-a304d2495cb8)
+   Client Characteristic Configuration (0x2902)
+   Characteristic User Description (0x2901)
+- Unknown Characteristic [W WNR] (0783b03e-8535-b5a0-7140-a304d2495cba)
+   Client Characteristic Configuration (0x2902)
+   Characteristic User Description (0x2901)
+D	19:31:28.074	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, true)
+I	19:31:28.234	Connection parameters updated (interval: 37.5ms, latency: 0, timeout: 5000ms)
+V	19:39:07.190	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:39:07.190	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:39:07.279	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:39:07.279	"Notifications and indications disabled" received
+V	19:39:10.257	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:39:10.257	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:39:10.336	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:39:10.336	"" received
+V	19:40:24.837	Enabling notifications for 0783b03e-8535-b5a0-7140-a304d2495cb8
+D	19:40:24.837	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, true)
+D	19:40:24.843	gatt.writeDescriptor(00002902-0000-1000-8000-00805f9b34fb, value=0x0100)
+I	19:40:24.923	Data written to descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 01-00
+A	19:40:24.923	"Notifications enabled" sent
+V	19:40:24.929	Notifications enabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:40:41.728	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:41.729	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:41.796	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:41.796	"" received
+V	19:40:42.674	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:42.674	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:42.735	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:42.735	"" received
+V	19:40:43.320	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:43.320	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:43.373	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:43.373	"" received
+V	19:40:43.932	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:43.932	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:44.011	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:44.011	"" received
+V	19:40:47.586	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:47.586	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:47.647	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:47.647	"" received
+V	19:40:48.068	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:48.068	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:48.134	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:48.134	"" received
+V	19:40:48.512	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:40:48.512	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:40:48.584	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:40:48.585	"" received
+V	19:41:03.286	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:41:03.286	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:41:03.361	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:41:03.361	"" received
+V	19:41:13.649	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:13.650	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:13.709	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:13.709	"Notifications and indications disabled" received
+D	19:41:13.712	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, false)
+V	19:41:13.715	Notifications and indications disabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:41:16.162	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:16.162	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:16.224	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:16.224	"Notifications and indications disabled" received
+V	19:41:17.194	Enabling notifications for 0783b03e-8535-b5a0-7140-a304d2495cb8
+D	19:41:17.194	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, true)
+D	19:41:17.198	gatt.writeDescriptor(00002902-0000-1000-8000-00805f9b34fb, value=0x0100)
+I	19:41:17.272	Data written to descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 01-00
+A	19:41:17.272	"Notifications enabled" sent
+V	19:41:17.274	Notifications enabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:41:23.518	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:23.518	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:23.573	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:23.573	"Notifications and indications disabled" received
+V	19:41:26.415	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:26.415	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:26.496	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:26.496	"Notifications and indications disabled" received
+V	19:41:27.971	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:41:27.971	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:41:28.074	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:41:28.074	"" received
+V	19:41:29.804	Disabling notifications for 0783b03e-8535-b5a0-7140-a304d2495cb8
+D	19:41:29.804	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, false)
+D	19:41:29.809	gatt.writeDescriptor(00002902-0000-1000-8000-00805f9b34fb, value=0x0000)
+I	19:41:29.873	Data written to descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:29.873	"Notifications and indications disabled" sent
+V	19:41:29.877	Notifications and indications disabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:41:31.724	Enabling notifications for 0783b03e-8535-b5a0-7140-a304d2495cb8
+D	19:41:31.724	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, true)
+D	19:41:31.727	gatt.writeDescriptor(00002902-0000-1000-8000-00805f9b34fb, value=0x0100)
+I	19:41:31.786	Data written to descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 01-00
+A	19:41:31.786	"Notifications enabled" sent
+V	19:41:31.791	Notifications enabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:41:38.496	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:38.497	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:38.576	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:38.576	"Notifications and indications disabled" received
+V	19:41:39.167	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:39.167	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:39.249	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:39.249	"Notifications and indications disabled" received
+V	19:41:40.377	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:40.377	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:40.448	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:40.448	"Notifications and indications disabled" received
+V	19:41:41.341	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:41:41.341	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:41:41.422	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:41:41.422	"" received
+V	19:41:43.773	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:43.773	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:43.861	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:43.861	"Notifications and indications disabled" received
+V	19:41:44.125	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:44.125	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:44.200	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:44.200	"Notifications and indications disabled" received
+V	19:41:44.321	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:44.321	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:44.387	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:44.387	"Notifications and indications disabled" received
+V	19:41:44.520	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:44.520	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:44.571	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:44.571	"Notifications and indications disabled" received
+V	19:41:44.720	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:41:44.720	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:41:44.798	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:41:44.798	"Notifications and indications disabled" received
+V	19:44:18.090	Writing request to characteristic 0783b03e-8535-b5a0-7140-a304d2495cba
+D	19:44:18.090	gatt.writeCharacteristic(0783b03e-8535-b5a0-7140-a304d2495cba, value=0xA5AAAC5E570801C5CCCA)
+I	19:44:18.163	Data written to 0783b03e-8535-b5a0-7140-a304d2495cba, value: (0x) A5-AA-AC-5E-57-08-01-C5-CC-CA
+A	19:44:18.163	"(0x) A5-AA-AC-5E-57-08-01-C5-CC-CA" sent
+V	19:44:38.325	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:44:38.325	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:44:38.376	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:44:38.376	"Notifications and indications disabled" received
+V	19:44:39.236	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:44:39.236	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:44:39.314	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:44:39.314	"Notifications and indications disabled" received
+V	19:44:39.620	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:44:39.620	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:44:39.692	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:44:39.692	"Notifications and indications disabled" received
+V	19:44:39.854	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:44:39.855	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:44:39.913	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:44:39.913	"Notifications and indications disabled" received
+V	19:44:40.092	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:44:40.092	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:44:40.178	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:44:40.178	"Notifications and indications disabled" received
+V	19:44:41.226	Reading descriptor 00002901-0000-1000-8000-00805f9b34fb
+D	19:44:41.226	gatt.readDescriptor(00002901-0000-1000-8000-00805f9b34fb)
+I	19:44:41.302	Read Response received from descr. 00002901-0000-1000-8000-00805f9b34fb, value: (0x) 00
+A	19:44:41.302	"" received
+V	19:45:09.946	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:45:09.946	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:45:10.025	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:45:10.025	"Notifications and indications disabled" received
+D	19:45:10.031	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, false)
+V	19:45:10.036	Notifications and indications disabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:45:11.561	Reading descriptor 00002902-0000-1000-8000-00805f9b34fb
+D	19:45:11.561	gatt.readDescriptor(00002902-0000-1000-8000-00805f9b34fb)
+I	19:45:11.636	Read Response received from descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:45:11.636	"Notifications and indications disabled" received
+V	19:45:12.636	Enabling notifications for 0783b03e-8535-b5a0-7140-a304d2495cb8
+D	19:45:12.636	gatt.setCharacteristicNotification(0783b03e-8535-b5a0-7140-a304d2495cb8, true)
+D	19:45:12.638	gatt.writeDescriptor(00002902-0000-1000-8000-00805f9b34fb, value=0x0100)
+I	19:45:12.723	Data written to descr. 00002902-0000-1000-8000-00805f9b34fb, value: (0x) 01-00
+A	19:45:12.723	"Notifications enabled" sent
+V	19:45:12.728	Notifications enabled for 0783b03e-8535-b5a0-7140-a304d2495cb8
+V	19:46:07.065	Reading all characteristics...
+V	19:46:07.065	Reading characteristic 00002a00-0000-1000-8000-00805f9b34fb
+D	19:46:07.065	gatt.readCharacteristic(00002a00-0000-1000-8000-00805f9b34fb)
+I	19:46:07.156	Read Response received from 00002a00-0000-1000-8000-00805f9b34fb, value: (0x) 41-4A-42-4C-45-31-30-30, "AJBLE100"
+A	19:46:07.156	"AJBLE100" received
+V	19:46:07.158	Reading characteristic 00002a01-0000-1000-8000-00805f9b34fb
+D	19:46:07.158	gatt.readCharacteristic(00002a01-0000-1000-8000-00805f9b34fb)
+I	19:46:07.230	Read Response received from 00002a01-0000-1000-8000-00805f9b34fb, value: (0x) 00-00
+A	19:46:07.230	"[0] Unknown" received
+V	19:46:07.231	Reading characteristic 00002a04-0000-1000-8000-00805f9b34fb
+D	19:46:07.231	gatt.readCharacteristic(00002a04-0000-1000-8000-00805f9b34fb)
+I	19:46:07.305	Read Response received from 00002a04-0000-1000-8000-00805f9b34fb, value: (0x) 10-00-18-00-10-00-58-02
+A	19:46:07.305	"Connection Interval: 20.00ms - 30.00ms,
+Max Latency: 16,
+Supervision Timeout Multiplier: 600" received
+V	19:46:07.306	3 characteristics read
+V	19:49:28.624	Writing request to characteristic 0783b03e-8535-b5a0-7140-a304d2495cba
+D	19:49:28.624	gatt.writeCharacteristic(0783b03e-8535-b5a0-7140-a304d2495cba, value=)
+I	19:49:28.683	Data written to 0783b03e-8535-b5a0-7140-a304d2495cba, value: 0 bytes
+V	19:50:37.899	Writing request to characteristic 0783b03e-8535-b5a0-7140-a304d2495cba
+D	19:50:37.899	gatt.writeCharacteristic(0783b03e-8535-b5a0-7140-a304d2495cba, value=0xA5AAAC5E570801C5CCCA)
+I	19:50:37.989	Data written to 0783b03e-8535-b5a0-7140-a304d2495cba, value: (0x) A5-AA-AC-5E-57-08-01-C5-CC-CA
+A	19:50:37.989	"(0x) A5-AA-AC-5E-57-08-01-C5-CC-CA" sent

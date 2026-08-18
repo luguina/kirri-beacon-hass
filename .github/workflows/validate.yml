@@ -1,0 +1,49 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Nightly, because HACS changes its own rules without this repository moving -
+    # a green build last week is not evidence of a green build today. Off the hour
+    # on purpose: the top of the hour is when every cron on GitHub fires at once.
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hacs:
+    name: HACS
+    runs-on: ubuntu-latest
+    # HACS reads hacs.json and the integration manifest from raw.githubusercontent.com,
+    # which is unauthenticated and 404s on a private repository - both files come back
+    # as None and the check fails on content that is in fact correct. This repository is
+    # private by ADR-014, so the job can only ever be red here. It stays in the tree,
+    # gated, because the tree it is written for is the public kirri-beacon-hass (#48),
+    # where it runs unchanged. `== false` rather than `!`, so a missing field skips the
+    # job instead of failing it.
+    if: github.event.repository.private == false
+    steps:
+      - uses: actions/checkout@v7
+
+      # No `ignore:` list, deliberately. Submitting to the hacs/default store (#49)
+      # requires a clean pass, and an ignore entry added now is debt discovered at
+      # submission time instead of here. Note that the description, topics and issues
+      # checks read GitHub repository *settings*, not files in the tree.
+      - uses: hacs/action@main
+        with:
+          category: integration
+
+  hassfest:
+    name: hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: home-assistant/actions/hassfest@master

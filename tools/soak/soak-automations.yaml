@@ -1,0 +1,187 @@
+# Soak harness for issue #14 — "Soak-test the bridge for 72 hours"
+#
+# Two automations, installed on the live Home Assistant box for the duration of the soak
+# and deleted afterwards. They are deliberately self-contained: no helpers, no packages,
+# no `configuration.yaml` edit, so removing the soak is two DELETEs and nothing else.
+#
+# Install / remove / read the results with:
+#     python3 tools/soak/soak.py install --curlrc <path-to-curlrc>
+#     python3 tools/soak/soak.py trigger --curlrc <path-to-curlrc>
+#     python3 tools/soak/soak.py report  --curlrc <path-to-curlrc> --since <ISO-8601>
+#     python3 tools/soak/soak.py remove  --curlrc <path-to-curlrc>
+#
+# `trigger` fires one exercise immediately and tails the result back; run it straight after
+# `install`. `report` requires `--since`, the soak's start timestamp.
+#
+# Why the logbook rather than counter helpers: `counter` entities are `.storage` collections
+# that can only be created over the WebSocket API, which would mean a second transport and a
+# second thing to clean up. `logbook.log` needs neither — the entries land in the same
+# recorder database as everything else, inherit its 10-day retention, and are queryable over
+# plain REST. The count *is* the log.
+
+# ---------------------------------------------------------------------------------------
+# 1. The exercise
+# ---------------------------------------------------------------------------------------
+# Every two hours between 08:00 and 22:00 the switch is flipped away from wherever it is,
+# verified, then put back and verified again. Both legs are absolute (`turn_on`/`turn_off`
+# by name, not `toggle`) so that a failed first leg cannot send the second leg the wrong way.
+#
+# Reading the results, note the asymmetry between the legs:
+#   * Leg 1 always changes state, so its verification is meaningful — this is the headline
+#     command success rate.
+#   * Leg 2 only changes state if leg 1 succeeded. When leg 1 has already failed, leg 2's
+#     wait template is true the instant it is evaluated and the leg passes for free. It is
+#     still worth running and worth checking, because a leg-1-ok / leg-2-failed pair is the
+#     case that leaves the diffuser inverted in the room for two hours, and that deserves
+#     to be shouted about rather than averaged away.
+#
+# Latency is measured around the *service call*, not around the state settling. Home
+# Assistant awaits the call, and the integration updates coordinator state inside it, so by
+# the time any wait step is evaluated the state has already followed — measuring the settle
+# reports 0.00s forever, which is what the first live run of this harness did. The call
+# duration is the honest number: it spans connect, write, echo and disconnect, and is what
+# `docs/hardware.md` measured at 3.1-5.1 s per cycle.
+#
+# The `wait_template` therefore verifies rather than times. On success it passes instantly;
+# on failure it is the thing that notices the state never followed, at the cost of one
+# timeout. Both numbers are logged on failure, because "the call returned in 4 s but the
+# state never moved" and "the call itself hung for 45 s" are different faults.
+- id: kirri_soak_exercise
+  alias: "Kirri soak — exercise (#14)"
+  description: >-
+    Soak test #14. Exercises the Kirri BLE write path with a state round-trip every 2 h
+    between 08:00 and 22:00 and records every attempt, failure and latency in the logbook
+    against switch.kirri_beacon. Delete this automation when the soak ends.
+  mode: single
+  max_exceeded: silent
+  triggers:
+    - trigger: time_pattern
+      hours: "/2"
+      minutes: "0"
+      seconds: "0"
+  conditions:
+    - condition: time
+      after: "07:00:00"
+      before: "22:59:00"
+  variables:
+    started_as: "{{ states('switch.kirri_beacon') }}"
+    flipped_to: "{{ 'off' if states('switch.kirri_beacon') == 'on' else 'on' }}"
+    wait_timeout: 45
+  actions:
+    # An unavailable switch is evidence, not a reason to stay quiet. Record it and stop
+    # rather than flipping a coin on what `turn_on` would even mean here.
+    - if:
+        - condition: template
+          value_template: "{{ started_as not in ['on', 'off'] }}"
+      then:
+        - action: logbook.log
+          data:
+            name: Kirri soak
+            entity_id: switch.kirri_beacon
+            message: "skip: switch is {{ started_as }}, not exercising"
+        - stop: "switch unavailable"
+
+    # ---- leg 1: flip away ----
+    - action: logbook.log
+      data:
+        name: Kirri soak
+        entity_id: switch.kirri_beacon
+        message: "attempt leg1: {{ started_as }} -> {{ flipped_to }}"
+    - variables:
+        leg1_t0: "{{ now().timestamp() }}"
+    - action: "switch.turn_{{ flipped_to }}"
+      target:
+        entity_id: switch.kirri_beacon
+      continue_on_error: true
+    - variables:
+        leg1_took: "{{ (now().timestamp() - leg1_t0) | round(2) }}"
+    - wait_template: "{{ is_state('switch.kirri_beacon', flipped_to) }}"
+      timeout: "{{ wait_timeout }}"
+      continue_on_timeout: true
+    - if:
+        - condition: template
+          value_template: "{{ wait.completed }}"
+      then:
+        - action: logbook.log
+          data:
+            name: Kirri soak
+            entity_id: switch.kirri_beacon
+            message: "ok leg1: reached {{ flipped_to }} in {{ leg1_took }}s"
+      else:
+        - action: logbook.log
+          data:
+            name: Kirri soak
+            entity_id: switch.kirri_beacon
+            message: "FAIL leg1: still {{ states('switch.kirri_beacon') }}, wanted {{ flipped_to }}; call returned after {{ leg1_took }}s, state never followed within {{ wait_timeout }}s"
+
+    # ---- leg 2: put it back ----
+    # The gap is the point, not politeness. The integration holds the BLE link open for
+    # `drain_seconds` (default 2.0) after every command and reuses it for anything that
+    # arrives inside that window, so a leg 2 fired immediately after leg 1 completes in
+    # ~0.09 s on a warm connection and never touches the connect path at all. Cold connect
+    # is where this stack actually fails - GATT error 133, proxy slot exhaustion, waiting on
+    # an advertising window - so a harness that skips it measures the easy half and reports
+    # a flattering median.
+    #
+    # 5 s gives 2.5x margin over the default drain window. **If you raise the integration's
+    # `drain_seconds` option, raise this above it**, or leg 2 quietly goes back to being a
+    # warm write and the soak stops testing what it claims to test.
+    - delay:
+        seconds: 5
+    - action: logbook.log
+      data:
+        name: Kirri soak
+        entity_id: switch.kirri_beacon
+        message: "attempt leg2: restoring to {{ started_as }}"
+    - variables:
+        leg2_t0: "{{ now().timestamp() }}"
+    - action: "switch.turn_{{ started_as }}"
+      target:
+        entity_id: switch.kirri_beacon
+      continue_on_error: true
+    - variables:
+        leg2_took: "{{ (now().timestamp() - leg2_t0) | round(2) }}"
+    - wait_template: "{{ is_state('switch.kirri_beacon', started_as) }}"
+      timeout: "{{ wait_timeout }}"
+      continue_on_timeout: true
+    - if:
+        - condition: template
+          value_template: "{{ wait.completed }}"
+      then:
+        - action: logbook.log
+          data:
+            name: Kirri soak
+            entity_id: switch.kirri_beacon
+            message: "ok leg2: restored to {{ started_as }} in {{ leg2_took }}s"
+      else:
+        - action: logbook.log
+          data:
+            name: Kirri soak
+            entity_id: switch.kirri_beacon
+            message: "FAIL leg2: LEFT INVERTED at {{ states('switch.kirri_beacon') }}, wanted {{ started_as }}; call returned after {{ leg2_took }}s"
+
+# ---------------------------------------------------------------------------------------
+# 2. Keep debug logging on across restarts
+# ---------------------------------------------------------------------------------------
+# `logger.set_level` is runtime-only and resets on every Home Assistant restart, which is
+# exactly the moment a 72-hour soak most needs its logs. Re-arming it on the `start` event
+# keeps the setting alive without touching `configuration.yaml`.
+#
+# Only our own component is raised to debug. `homeassistant.components.bluetooth` at debug
+# would bury the signal in advertisement spam and churn the log file; at ~96 polls and 16
+# writes a day this integration's own output is a few hundred lines a day.
+- id: kirri_soak_debug_logging
+  alias: "Kirri soak — keep debug logging on (#14)"
+  description: >-
+    Soak test #14. Re-applies debug logging for the Kirri integration after every Home
+    Assistant restart, because logger.set_level does not survive one. Delete this
+    automation when the soak ends.
+  mode: single
+  triggers:
+    - trigger: homeassistant
+      event: start
+  conditions: []
+  actions:
+    - action: logger.set_level
+      data:
+        custom_components.kirri_beacon: debug

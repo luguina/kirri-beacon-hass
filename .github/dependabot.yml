@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "build(ci)"
+    labels: ["dependencies", "github_actions"]
+
+  # requirements_test.txt is pinned hard so CI cannot drift under the suite. That only
+  # works if something proposes the bumps deliberately, which is this.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "build(deps)"
+    labels: ["dependencies"]

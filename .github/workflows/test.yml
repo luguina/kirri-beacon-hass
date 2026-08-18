@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+
+      - name: Install test dependencies
+        run: pip install -r requirements_test.txt
+
+      # tests/test_device.py and tests/test_entities.py open with
+      # pytest.importorskip("homeassistant"), and tests/test_soak.py does the same for
+      # PyYAML. If an install quietly resolves the wrong thing, those modules skip and
+      # pytest still exits 0 - a green build over a third of the suite. This step and the
+      # one after it exist so that outcome is red instead, and neither reads pytest's
+      # summary line to decide.
+      - name: Fail loudly if the test dependencies did not install
+        run: |
+          python -c "from homeassistant.const import __version__; print('homeassistant', __version__)"
+          python -c "import yaml; print('PyYAML', yaml.__version__)"
+
+      - name: Run the suite
+        run: python -m pytest -q --junitxml=junit.xml
+
+      # Deliberately asserts "nothing skipped" rather than a pass count. The count grows
+      # with almost every PR - it went 83 to 96 to 178 over three weeks - so a hardcoded
+      # number rots into a chore, while "0 skipped" stays true forever and is the thing
+      # actually worth guaranteeing.
+      - name: Fail if any test skipped
+        if: always()
+        run: |
+          python - <<'PY'
+          import sys, xml.etree.ElementTree as ET
+
+          tests = skipped = 0
+          for suite in ET.parse("junit.xml").getroot().iter("testsuite"):
+              tests += int(suite.get("tests", 0))
+              skipped += int(suite.get("skipped", 0))
+
+          print(f"{tests} tests collected, {skipped} skipped")
+          if tests == 0:
+              sys.exit("no tests ran at all - collection found nothing")
+          if skipped:
+              sys.exit(f"{skipped} test(s) skipped: a dependency in requirements_test.txt "
+                       "did not install, so part of the suite never ran")
+          PY
+
+  lint:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      # -c uses requirements_test.txt purely as a version pin, so ruff arrives at the
+      # same version the suite pins without dragging Home Assistant in behind it.
+      - name: Install ruff at the pinned version
+        run: pip install -c requirements_test.txt ruff
+
+      - run: ruff check .

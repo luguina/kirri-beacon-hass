@@ -1,0 +1,7 @@
+# Blank issues stay on: the maintainer's own planning issues follow a different shape
+# to these two forms, and losing that would cost more than the forms gain.
+blank_issues_enabled: true
+contact_links:
+  - name: Which Kirri do I have?
+    url: https://github.com/luguina/kirri-beacon-hass#what-you-need
+    about: Only the Kirri Beacon (SKU SAH5910) is supported. The Element speaks a different protocol.

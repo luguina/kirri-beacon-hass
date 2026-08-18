@@ -1,0 +1,42 @@
+# --- Capture artefacts (may contain MAC addresses, WiFi details, account tokens) ---
+*.log
+*.pcap
+*.pcapng
+*.btsnoop
+btsnoop_hci*
+bugreport*
+*.zip
+*.apk
+*.dex
+*.jadx*
+
+# --- Secrets ---
+secrets.yaml
+.env
+*.key
+
+# --- ESPHome build output ---
+.esphome/
+esphome/.esphome/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# --- Agent tooling ---
+# Local Claude Code permissions. Listed here rather than left to a machine-local
+# ~/.config/git/ignore, which does not travel to a fresh clone: this file records the exact
+# curl commands run against the live box, the token file's path among them.
+.claude/settings.local.json
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Editors ---
+.vscode/
+.idea/
+*.swp

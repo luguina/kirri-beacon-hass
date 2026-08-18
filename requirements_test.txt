@@ -1,0 +1,21 @@
+# Test dependencies, pinned to what the Home Assistant box actually runs. The point of
+# the suite is to catch a change breaking against the core this integration is deployed
+# on, not against whatever pip happened to resolve the day CI ran.
+#
+# These need Python 3.14. On 3.12 pip silently backtracks to Home Assistant 2025.1.4 and
+# on 3.13 to 2026.2.3 - both import cleanly and then test a core nobody runs.
+homeassistant==2026.8.1
+pytest==9.1.1
+
+# Imported by homeassistant.components.usb but not declared by the core package. Without
+# them, collection dies inside that import instead of running the tests.
+aiousbwatcher==1.1.2
+serialx==1.8.2
+
+# tests/test_soak.py calls pytest.importorskip("yaml"). Missing, it skips in silence.
+PyYAML==6.0.3
+
+# Pinned on purpose: an unpinned ruff picks up new rules on release and turns CI red
+# on a morning nobody changed anything. The lint job installs it from here with
+# `pip install -c requirements_test.txt ruff`, so the pin lives in exactly one place.
+ruff==0.16.3

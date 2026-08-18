@@ -1,0 +1,48 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "bluetooth_confirm": {
+        "title": "Kirri Beacon Diffuser",
+        "description": "Set up the Kirri Beacon Diffuser at {address}?\n\nHome Assistant will connect once to confirm it really is a Beacon — the diffuser only advertises a generic service UUID that many other devices also use, so this check is the only way to be sure."
+      },
+      "user": {
+        "title": "Kirri Beacon Diffuser",
+        "description": "Enter the diffuser's Bluetooth address.\n\nIf it is not listed automatically, check it is switched on — after a power cut the Beacon stays off until its base button is pressed by hand.",
+        "data": {
+          "address": "Bluetooth address"
+        },
+        "data_description": {
+          "address": "Six pairs of hex digits, e.g. AA:BB:CC:DD:EE:FF"
+        }
+      }
+    },
+    "error": {
+      "invalid_address": "That is not a Bluetooth address. Expected six colon-separated pairs of hex digits.",
+      "cannot_connect": "The diffuser is not reachable. Check it is switched on at the base and that the Bluetooth proxy near it is online.",
+      "not_supported": "Something answered at that address, but it is not a Kirri Beacon — it does not have the vendor service.",
+      "unknown": "Unexpected error. Check the Home Assistant log."
+    },
+    "abort": {
+      "already_configured": "This diffuser is already set up.",
+      "cannot_connect": "The diffuser is not reachable. Check it is switched on at the base and that the Bluetooth proxy near it is online.",
+      "not_supported": "This device advertises the same generic service as the Kirri Beacon but is not one.",
+      "unknown": "Unexpected error. Check the Home Assistant log."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kirri Beacon Diffuser options",
+        "data": {
+          "poll_interval": "Status poll interval (seconds)",
+          "drain_seconds": "Keep the connection open for (seconds)"
+        },
+        "data_description": {
+          "poll_interval": "Only a safety net — the diffuser confirms every change immediately, and availability comes from its advertisements. Long intervals cost nothing.",
+          "drain_seconds": "How long to hold the Bluetooth link after a command, so a follow-up does not pay for another connection. Each connection takes 3–5 seconds."
+        }
+      }
+    }
+  }
+}

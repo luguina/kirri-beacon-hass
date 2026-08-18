@@ -1,0 +1,37 @@
+# Test configuration only. This project is a Home Assistant custom integration, which is
+# installed by copying custom_components/kirri_beacon/ into an HA config directory - there is
+# nothing here to build or package.
+#
+# `pythonpath` is what lets tests/ and tools/ import protocol.py directly, without turning it
+# into an installable package. protocol.py must therefore stay free of intra-package imports.
+
+[tool.pytest.ini_options]
+# "." makes `custom_components.kirri_beacon.*` importable (the transport tests, which skip
+# unless Home Assistant is installed); the second entry makes protocol.py importable on its
+# own, with no HA and no package machinery.
+pythonpath = [".", "custom_components/kirri_beacon"]
+testpaths = ["tests"]
+
+# Linting. Deliberately small: the job is to catch real defects and to keep every
+# `# noqa` in the tree honest, not to reformat a working codebase. E501, import
+# sorting and pyupgrade are all left out for that reason.
+
+[tool.ruff]
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+  "E4",     # misplaced and shadowed imports
+  "E7",     # statement-level errors - comparisons to None/True, ambiguous names
+  "E9",     # syntax and IO errors
+  "F",      # pyflakes: undefined names, unused imports and variables
+  "BLE",    # `except Exception` that swallows the error instead of logging or re-raising
+  "ASYNC",  # async footguns - the integration is async end to end
+  "RUF100", # a `# noqa` naming a rule that no longer fires
+]
+
+[tool.ruff.lint.per-file-ignores]
+# kirri_probe.py polls for its notification with sleep(0.02) rather than waiting on
+# an asyncio.Event. That is worth fixing, but it needs the diffuser to test against
+# and this file is a standalone diagnostic that never runs inside Home Assistant.
+"tools/kirri_probe.py" = ["ASYNC110"]

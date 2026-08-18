@@ -1,0 +1,3 @@
+# Every path, one maintainer. Matches `codeowners` in
+# custom_components/kirri_beacon/manifest.json, which Home Assistant reads separately.
+* @luguina

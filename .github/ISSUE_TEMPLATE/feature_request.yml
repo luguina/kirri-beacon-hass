@@ -1,0 +1,30 @@
+name: Feature request
+description: Something the integration should do and does not
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The goal, not the implementation. What does the device need to do that it cannot?
+    validations:
+      required: true
+
+  - type: textarea
+    id: protocol
+    attributes:
+      label: Does the protocol already support it?
+      description: |
+        `docs/protocol.md` is the recovered BLE spec, and `python3 tools/frames.py` prints
+        and checks every frame in it with no hardware and no dependencies. If what you want
+        is already a documented frame, say which — that turns a feature request into a
+        small one.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: hardware
+    attributes:
+      label: Hardware
+      options:
+        - label: I have a Kirri Beacon and can test a change against it

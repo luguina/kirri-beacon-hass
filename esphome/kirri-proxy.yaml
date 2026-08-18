@@ -1,0 +1,216 @@
+# Kirri Beacon BLE → WiFi bridge.
+#
+# This board is a *transparent* Bluetooth proxy. It contains no Kirri protocol
+# logic at all — see docs/decisions.md ADR-001 and ADR-007. All framing lives in
+# the Home Assistant integration; this box just carries GATT traffic over WiFi
+# because the diffuser is three floors from the HA host.
+#
+# Setup (from the repository root):
+#   cp esphome/secrets.yaml.example esphome/secrets.yaml   and fill it in.
+#
+# secrets.yaml must sit NEXT TO THIS FILE. ESPHome resolves !secret relative to the
+# config file's own directory, not your shell's working directory, so a copy left in
+# the repo root is never read.
+#
+# Flash:  see esphome/README.md.
+
+substitutions:
+  name: kirri-proxy
+  friendly_name: Kirri Proxy
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  # NOT optional. 2026.5.0 carries the BLE reliability fix that holds
+  # ESP_COEX_PREFER_BT for the lifetime of an active connection. Without it,
+  # sustained WiFi traffic causes GATT connects to fail with status=0x85
+  # (the infamous "error 133") — which looks exactly like a protocol bug.
+  min_version: 2026.5.0
+  on_boot:
+    # NOT optional on the XIAO ESP32C6, and not about the external antenna.
+    #
+    # Both antennas sit behind an RF switch that is only biased when GPIO3 is driven
+    # LOW. Undriven, the radio still works — it is just ~20 dB down, which reads as a
+    # weak-but-functional link rather than as a fault. Measured at the install site:
+    # −78 dBm to the Kirri and −51 dBm WiFi, where the FireBeetle read −56 and −26 from
+    # the same spot. A chip antenna costs 3–6 dB against a PCB one; it does not cost 22.
+    #
+    # GPIO14 LOW selects the onboard ceramic antenna. HIGH would select the u.FL — we
+    # have no external antenna fitted, so LOW is the one that must be asserted.
+    #
+    # Caveat, deliberately left in place rather than silently "fixed": Seeed's wiki says
+    # LOW selects built-in, their forum says built-in wants this pin left as an INPUT.
+    # Driving it LOW is what we measured (+20 dB on WiFi) so it stays until INPUT is
+    # measured too — see docs/hardware.md, "Open: is GPIO14 driven LOW actually the best
+    # built-in-antenna setting?".
+    #
+    # Priority 800 is above WiFi and BLE, so the switch is biased before either radio
+    # comes up.
+    priority: 800
+    then:
+      - output.turn_off: rf_switch_enable
+      - delay: 100ms
+      - output.turn_off: rf_antenna_select
+
+esp32:
+  # Seeed XIAO ESP32C6 since 2026-08-09 (docs/lab/soak-2026-08.md, ADR-010). The FireBeetle 2
+  # ESP32-E it replaced is kept as a known-good fallback, and swapping back is the
+  # fastest way to tell a C6 problem from a site problem. Nothing about the FireBeetle
+  # failed — this was a downsizing decision, not a fix.
+  #
+  # Reverting is NOT just these two lines. Restore variant: esp32 /
+  # board: dfrobot_firebeetle2_esp32e AND delete both RF-switch blocks — the on_boot
+  # handler above and the output: section below. GPIO3/GPIO14 are ordinary pins on the
+  # FireBeetle, so leaving them driven would be meaningless at best.
+  variant: esp32c6
+  board: seeed_xiao_esp32c6
+  framework:
+    # NOT arduino. The Arduino framework is less reliable under sustained proxy
+    # load and is not what ESPHome's own bluetooth_proxy docs target.
+    type: esp-idf
+
+logger:
+  # INFO, not DEBUG. Verbose BLE logging on a proxy is a real throughput cost and
+  # can itself provoke the coexistence failures above. Raise it temporarily when
+  # debugging, then put it back.
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Fallback AP so a WiFi change three floors up doesn't mean carrying the board
+  # back down to a USB port.
+  ap:
+    ssid: ${friendly_name} Fallback
+    password: !secret ap_password
+
+captive_portal:
+
+# ---------------------------------------------------------------------------
+# Bluetooth
+# ---------------------------------------------------------------------------
+
+esp32_ble:
+  # max_connections is the total BLE connection pool; bluetooth_proxy's
+  # connection_slots *consumes from* it (esp32_ble.consume_connection_slots).
+  # Over-consuming is caught at validation with an explicit "Please set
+  # max_connections: N" — so that direction is safe. The silent one is the
+  # reverse: raising max_connections alone gives the proxy no extra slots.
+  #
+  # Three slots for one diffuser is deliberate headroom, not a need — see the
+  # slot-leak bug noted in esphome/README.md.
+  max_connections: 3
+
+esp32_ble_tracker:
+  scan_parameters:
+    # window == interval is continuous scanning, which is what a proxy wants:
+    # any gap is a window where an advertisement is missed and HA thinks the
+    # device went away.
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  # THE most important line in this file. With active: false the proxy forwards
+  # advertisements only and no GATT write will ever reach the diffuser — you get
+  # a device that Home Assistant can see and cannot control, with no error to
+  # explain why.
+  active: true
+  connection_slots: 3
+
+# ---------------------------------------------------------------------------
+# Antenna RF switch (XIAO ESP32C6 only)
+#
+# Declared as outputs purely so on_boot above can drive them. Nothing else touches
+# these pins, and they carry no meaning as entities — they are board wiring, not
+# controls, so they stay out of Home Assistant.
+#
+# On the FireBeetle this whole section does not exist and must not be added, nor does the
+# on_boot handler that drives it: GPIO3/GPIO14 are ordinary pins on that board.
+# ---------------------------------------------------------------------------
+
+output:
+  - platform: gpio
+    id: rf_switch_enable
+    pin: GPIO3
+  - platform: gpio
+    id: rf_antenna_select
+    pin: GPIO14
+
+# ---------------------------------------------------------------------------
+# Diagnostics
+#
+# These exist to answer #5 (site the proxy) and to give a later "it stopped
+# working" a baseline to compare against. Radio problems on this project are
+# indistinguishable from protocol bugs until you look at the numbers.
+# ---------------------------------------------------------------------------
+
+sensor:
+  - platform: wifi_signal
+    name: WiFi Signal
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+
+  # Signal strength to the diffuser itself. This is the number that goes in the
+  # install-site table in docs/lab/soak-2026-08.md.
+  #
+  # The Beacon's advertised address has the multicast bit set (see
+  # docs/research/dossier.md §6.1) — it is not a valid public IEEE address. It
+  # still matches fine here, since this is a plain byte comparison. If the sensor
+  # reads "unknown" forever, re-check the MAC after a device power cycle before
+  # assuming the config is wrong.
+  - platform: ble_rssi
+    mac_address: !secret kirri_mac
+    name: Kirri RSSI
+    id: kirri_rssi
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: Uptime
+    entity_category: diagnostic
+
+  - platform: internal_temperature
+    name: Internal Temperature
+    entity_category: diagnostic
+
+binary_sensor:
+  - platform: status
+    name: Status
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+      entity_category: diagnostic
+    ssid:
+      name: Connected SSID
+      entity_category: diagnostic
+    bssid:
+      # Which AP it actually associated with. Matters in a multi-AP house: a
+      # proxy that roams to the wrong AP looks like a flaky proxy.
+      name: Connected BSSID
+      entity_category: diagnostic
+
+  - platform: version
+    name: ESPHome Version
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: Restart
+    entity_category: diagnostic
+
+# Deliberately NOT included:
+#
+#   web_server:  costs RAM that BLE connection buffers need. ESPHome's own
+#                bluetooth proxy reference config omits it for the same reason.
+#                The ESPHome dashboard and HA already give you everything it would.

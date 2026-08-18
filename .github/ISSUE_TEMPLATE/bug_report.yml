@@ -1,0 +1,61 @@
+name: Bug report
+description: Something the integration does that it should not
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before anything else: this only supports the **Kirri Beacon, SKU SAH5910**. The
+        Element speaks a different protocol on different UUIDs, and Macro and Pillar are
+        untested — if you have one of those, the answer is "not supported yet".
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead.
+    validations:
+      required: true
+
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.8.1"
+    validations:
+      required: true
+
+  - type: input
+    id: integration-version
+    attributes:
+      label: Integration version
+      description: The `version` field in `custom_components/kirri_beacon/manifest.json`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: proxy
+    attributes:
+      label: How does Home Assistant reach the diffuser?
+      options:
+        - An ESPHome Bluetooth proxy
+        - A Bluetooth adapter on the Home Assistant host
+        - Something else (say so below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Set `custom_components.kirri_beacon` to debug (Settings → Devices & Services →
+        Logs, or the `logger.set_level` service) and reproduce it. That prints every frame
+        as `TX …` / `RX …`, which is usually the whole diagnosis.
+
+        **Redact your MAC addresses** — the placeholder used throughout this repo is
+        `11:22:33:44:55:66`.
+      render: text
+    validations:
+      required: true
