@@ -10,7 +10,7 @@ pytest==9.1.1
 # Imported by homeassistant.components.usb but not declared by the core package. Without
 # them, collection dies inside that import instead of running the tests.
 aiousbwatcher==1.1.2
-serialx==1.8.2
+serialx==1.10.0
 
 # tests/test_soak.py calls pytest.importorskip("yaml"). Missing, it skips in silence.
 PyYAML==6.0.3
